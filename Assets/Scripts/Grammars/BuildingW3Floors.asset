@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BuildingW3Floors
   m_EditorClassIdentifier: 
   axiom: B
-  iterations: 2
-  randomSeed: 0
+  iterations: 8
+  randomSeed: -1
   rules:
   - predecessor: 66
     successors:
@@ -22,9 +22,16 @@ MonoBehaviour:
     weights: []
   - predecessor: 71
     successors:
-    - DFWF+WFFF+FFFF+WFFF+
+    - DFWF+WFFF+FFFF+WFFF+T
     weights: []
   - predecessor: 72
     successors:
-    - WWFF+WFFF+FFFF+WFFF+
+    - XXFF+XFXF+XXXX+XFFF+T
     weights: []
+  - predecessor: 88
+    successors:
+    - W
+    - F
+    weights:
+    - 0.5
+    - 0.5

@@ -14,6 +14,11 @@ public class ProceduralBuildingGenerator : MonoBehaviour
     public float wallHeight = 3f;
     public float floorHeight = 3.2f; // wallHeight + a little gap for floor slab
 
+    [Header("Floor")]
+    public GameObject floorPrefab;
+    public float floorThickness = 0.2f;
+    public int floorSegmentsPerSide = 4; // our G/H make 4-step squares
+
     [Tooltip("Yaw rotation in degrees for + / -")]
     public float yawAngle = 90f;
 
@@ -99,6 +104,10 @@ public class ProceduralBuildingGenerator : MonoBehaviour
                     current.position += Vector3.up * floorHeight;
                     break;
 
+                case 'T':
+                    PlaceFloorAtCurrentSquareCenter(current);
+                    break;
+
                 case 'C':
                 case 'S': // Spawn point
                     PlacePrefabIfMapped(c, current);
@@ -171,4 +180,24 @@ public class ProceduralBuildingGenerator : MonoBehaviour
         GameObject instance = Instantiate(m.prefab, worldPos, worldRot, transform);
         instance.name = $"{symbol}_Segment";
     }
+
+    private void PlaceFloorAtCurrentSquareCenter(TurtleState turtle)
+    {
+        if (floorPrefab == null) return;
+
+        float sideWorld = stepLength * floorSegmentsPerSide;
+
+        // Center of the square relative to the current corner/orientation
+        Vector3 offsetLocal = 
+            Vector3.forward * (sideWorld / 2f) + 
+            Vector3.right   * (sideWorld / 2f);
+
+        Vector3 pos = turtle.position + turtle.rotation * offsetLocal;
+        pos += Vector3.up * (floorThickness / 2f); // lift slightly
+
+        Quaternion rot = Quaternion.Euler(0f, turtle.rotation.eulerAngles.y, 0f);
+
+        GameObject inst = Instantiate(floorPrefab, pos, rot, transform);
+        inst.transform.localScale = new Vector3(sideWorld, floorThickness, sideWorld);
+    }    
 }
