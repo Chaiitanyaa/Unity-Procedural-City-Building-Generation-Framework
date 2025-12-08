@@ -59,9 +59,28 @@ public class ProceduralBuildingGenerator : MonoBehaviour
         }
 
         // Clear previous children (simple version, improve with pooling later)
-        for (int i = transform.childCount - 1; i >= 0; i--)
+        //for (int i = transform.childCount - 1; i >= 0; i--)
+        //{
+        //    DestroyImmediate(transform.GetChild(i).gameObject);
+        //}
+        var toDelete = new System.Collections.Generic.List<GameObject>();
+        foreach (Transform child in transform)
         {
-            DestroyImmediate(transform.GetChild(i).gameObject);
+            toDelete.Add(child.gameObject);
+        }
+
+        foreach (var go in toDelete)
+        {
+            if (Application.isPlaying)
+            {
+                // RUNTIME
+                Destroy(go);
+            }
+            else
+            {
+                // EDITOR (when using Context Menu "Generate Now")
+                DestroyImmediate(go);
+            }
         }
 
         // Expand grammar
