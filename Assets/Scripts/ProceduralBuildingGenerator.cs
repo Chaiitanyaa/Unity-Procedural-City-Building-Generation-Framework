@@ -219,4 +219,35 @@ public class ProceduralBuildingGenerator : MonoBehaviour
         GameObject inst = Instantiate(floorPrefab, pos, rot, transform);
         inst.transform.localScale = new Vector3(sideWorld, floorThickness, sideWorld);
     }    
+
+    public void ApplyTheme(BuildingTheme theme)
+    {
+        if (theme == null)
+        {
+            Debug.LogWarning("ApplyTheme called with null theme.");
+            return;
+        }
+
+        // Update mapping prefabs based on symbol
+        for (int i = 0; i < mappings.Length; i++)
+        {
+            switch (mappings[i].symbol)
+            {
+                case 'F': // plain wall
+                    mappings[i].prefab = theme.wallPrefab;
+                    break;
+                case 'W': // window wall
+                    mappings[i].prefab = theme.windowPrefab;
+                    break;
+                case 'D': // door wall
+                    mappings[i].prefab = theme.doorPrefab;
+                    break;
+            }
+        }
+
+        // Floor prefab (used by T or your floor placement)
+        floorPrefab = theme.floorPrefab;
+
+        Debug.Log("Applied theme: " + theme.name);
+    }
 }
