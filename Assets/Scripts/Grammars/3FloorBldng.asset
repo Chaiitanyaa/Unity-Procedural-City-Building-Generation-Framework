@@ -28,10 +28,6 @@ MonoBehaviour:
     successors:
     - XXFF+XFFF+FFFF+XFFF+T
     weights: []
-  - predecessor: 72
-    successors:
-    - XXFF+XFFF+FFFF+XFFF+T
-    weights: []
   - predecessor: 88
     successors:
     - W

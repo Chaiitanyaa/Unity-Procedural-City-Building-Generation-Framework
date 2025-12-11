@@ -25,9 +25,10 @@ public class CityRoadGenerator : MonoBehaviour
     public float maxRoadSpacing = 40f;
 
     [Header("Buildings Along Roads")]
-    public float buildingSpacing = 18f;
-    public float sidewalkOffset = 10f;    // how far from road centerline
+    public float buildingSpacing = 18f;    // base spacing along road
+    public float sidewalkOffset = 10f;     // distance from road center
     public int maxBuildingsPerRoad = 30;
+    public float buildingExtraGap = 4f;    // extra space so they don’t touch
 
     [Header("Parents")]
     public Transform roadsParent;
@@ -59,20 +60,22 @@ public class CityRoadGenerator : MonoBehaviour
         List<float> horizontalZs = GenerateRoadLines(-cityDepth * 0.5f, cityDepth * 0.5f, horizontalRoadCount);
 
         // 2) Build road visuals (vertical + horizontal)
+        // Vertical roads: roads + buildings
         foreach (float x in verticalXs)
         {
             Vector3 start = new Vector3(x, 0f, -cityDepth * 0.5f);
             Vector3 end   = new Vector3(x, 0f,  cityDepth * 0.5f);
             CreateRoadSegment(start, end);
-            SpawnBuildingsAlongRoad(start, end);
+            SpawnBuildingsAlongRoad(start, end);   // <— KEEP
         }
 
+        // Horizontal roads: roads only
         foreach (float z in horizontalZs)
         {
             Vector3 start = new Vector3(-cityWidth * 0.5f, 0f, z);
             Vector3 end   = new Vector3( cityWidth * 0.5f, 0f, z);
             CreateRoadSegment(start, end);
-            SpawnBuildingsAlongRoad(start, end);
+            // SpawnBuildingsAlongRoad(start, end); // <— COMMENT THIS OUT
         }
 
         sw.Stop();
@@ -129,63 +132,91 @@ public class CityRoadGenerator : MonoBehaviour
 
     private void SpawnBuildingsAlongRoad(Vector3 start, Vector3 end)
     {
+        if (buildingGeneratorPrefab == null)
+            return;
+
         float segmentLength = (end - start).magnitude;
-        if (segmentLength < buildingSpacing) return;
+        if (segmentLength < 1f) return;
 
-        Vector3 dir = (end - start).normalized;
-        Vector3 side = Vector3.Cross(Vector3.up, dir).normalized; // right-hand side
+        // Building footprint from your generator
+        float sideWorld = buildingGeneratorPrefab.stepLength *
+                        buildingGeneratorPrefab.floorSegmentsPerSide;
 
-        float dist = buildingSpacing * 0.5f;
+        // Extra gap so they don't touch
+        float effectiveSpacing = Mathf.Max(buildingSpacing, sideWorld + buildingExtraGap);
+
+        if (segmentLength < effectiveSpacing)
+            return;
+
+        Vector3 dir  = (end - start).normalized;                     // along road
+        Vector3 side = Vector3.Cross(Vector3.up, dir).normalized;    // right of road
+
+        float intersectionBuffer = effectiveSpacing * 0.5f;
+        float dist = intersectionBuffer;
         int buildingsOnThisRoad = 0;
 
-        while (dist < segmentLength - buildingSpacing * 0.5f &&
-               buildingsOnThisRoad < maxBuildingsPerRoad)
+        while (dist < segmentLength - intersectionBuffer &&
+            buildingsOnThisRoad < maxBuildingsPerRoad)
         {
             Vector3 roadPoint = start + dir * dist;
 
-            // Spawn on both sides
+            // both sides of road
             SpawnSingleBuilding(roadPoint + side * sidewalkOffset, -side);
             SpawnSingleBuilding(roadPoint - side * sidewalkOffset,  side);
 
             buildingsOnThisRoad += 2;
-            dist += buildingSpacing;
+            dist += effectiveSpacing;
         }
     }
 
-    private void SpawnSingleBuilding(Vector3 position, Vector3 forwardTowardsRoad)
+    private void SpawnSingleBuilding(Vector3 centerNearRoad, Vector3 forwardTowardsRoad)
     {
         if (buildingGeneratorPrefab == null) return;
 
-        Quaternion rot = Quaternion.LookRotation(forwardTowardsRoad, Vector3.up);
+        // Orientation: building "forward" points toward the road
+        Vector3 fwd = forwardTowardsRoad.normalized;
+        Vector3 right = Vector3.Cross(Vector3.up, fwd).normalized;
 
-        var parent = buildingsParent != null ? buildingsParent : transform;
+        Quaternion rot = Quaternion.LookRotation(fwd, Vector3.up);
+
+        // Footprint size (same as in your floor code)
+        float sideWorld = buildingGeneratorPrefab.stepLength *
+                        buildingGeneratorPrefab.floorSegmentsPerSide;
+
+        // Our generator's origin is back-left corner, building extends in +forward/+right.
+        // We want the *center* of the building at centerNearRoad.
+        // center = origin + (fwd + right) * (sideWorld / 2)
+        // => origin = center - (fwd + right) * (sideWorld / 2)
+        Vector3 originPos = centerNearRoad - (fwd + right) * (sideWorld * 0.5f);
+
+        Transform parent = buildingsParent != null ? buildingsParent : transform;
 
         ProceduralBuildingGenerator building =
-            Instantiate(buildingGeneratorPrefab, position, rot, parent);
+            Instantiate(buildingGeneratorPrefab, originPos, rot, parent);
 
-        // Optional: choose random grammar
+        // Optional: random grammar
         if (buildingGrammars != null && buildingGrammars.Length > 0)
         {
             int gi = Random.Range(0, buildingGrammars.Length);
             building.grammarAsset = buildingGrammars[gi];
         }
 
-        // Optional: choose random theme
+        // Optional: random theme
         if (buildingThemes != null && buildingThemes.Length > 0)
         {
             int ti = Random.Range(0, buildingThemes.Length);
             building.ApplyTheme(buildingThemes[ti]);
         }
 
-        // For variety, randomize grammar seed
         if (building.grammarAsset != null)
         {
-            building.grammarAsset.randomSeed = -1;
+            building.grammarAsset.randomSeed = -1; // random facades
         }
 
         building.Generate();
         spawnedBuildings.Add(building.gameObject);
     }
+
 
     public void ClearCity()
     {

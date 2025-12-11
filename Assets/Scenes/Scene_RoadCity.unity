@@ -267,7 +267,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2a4ecba7a28374d25868a0a027c88f6d, type: 2}
   - {fileID: 11400000, guid: fe51d1ca08f5e4e52acbff77224b4252, type: 2}
   roadPrefab: {fileID: 3685685588454787425, guid: a628a14ec83fe45e78480728cf2f6aad, type: 3}
-  roadWidth: 6
+  roadWidth: 20
   roadThickness: 0.2
   cityWidth: 200
   cityDepth: 200
@@ -278,6 +278,7 @@ MonoBehaviour:
   buildingSpacing: 18
   sidewalkOffset: 10
   maxBuildingsPerRoad: 30
+  buildingExtraGap: 4
   roadsParent: {fileID: 1654193773}
   buildingsParent: {fileID: 1356754489}
 --- !u!4 &571545560
