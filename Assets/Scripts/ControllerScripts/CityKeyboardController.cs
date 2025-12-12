@@ -1,23 +1,30 @@
 using UnityEngine;
 
+/// <summary>
+/// Keyboard controls for Scene 3:
+/// C = generate a new L-system city
+/// X = clear current city
+/// </summary>
 public class CityKeyboardController : MonoBehaviour
 {
-    public CityRoadGenerator city;
+    [Tooltip("Reference to the L-system road city generator in this scene.")]
+    public LSystemRoadCityGenerator cityGenerator;
 
     void Update()
     {
-        if (!Application.isPlaying || city == null) return;
+        if (!Application.isPlaying || cityGenerator == null)
+            return;
 
-        // C = generate city
+        // Generate a new city
         if (Input.GetKeyDown(KeyCode.C))
         {
-            city.GenerateCity();
+            cityGenerator.GenerateCity();
         }
 
-        // X = clear
+        // Clear everything
         if (Input.GetKeyDown(KeyCode.X))
         {
-            city.ClearCity();
+            cityGenerator.ClearCity();
         }
     }
 }
