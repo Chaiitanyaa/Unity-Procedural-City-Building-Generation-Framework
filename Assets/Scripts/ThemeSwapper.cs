@@ -42,7 +42,7 @@ public class ThemeSwapper : MonoBehaviour
         generator.ApplyTheme(theme);
     }
 
-    // Optional: auto-apply theme when you change index in Inspector
+    //auto-apply theme when you change index in Inspector
     void OnValidate()
     {
         if (generator == null || themes == null || themes.Length == 0)

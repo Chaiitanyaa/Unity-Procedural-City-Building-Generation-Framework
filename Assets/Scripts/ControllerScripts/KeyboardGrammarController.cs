@@ -4,7 +4,7 @@ public class KeyboardGrammarController : MonoBehaviour
 {
     [Header("Core")]
     public ProceduralBuildingGenerator generator;
-    public GrammarAsset[] grammars;   // assign 3 grammars in inspector
+    public GrammarAsset[] grammars; // Array of available grammars
 
     private int currentGrammarIndex = 0;
 
@@ -24,7 +24,7 @@ public class KeyboardGrammarController : MonoBehaviour
         if (!Application.isPlaying || generator == null || grammars == null || grammars.Length == 0)
             return;
 
-        // ---------- Grammar switching ----------
+        //Switch grammars
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             LoadGrammar(0, true);
@@ -43,7 +43,7 @@ public class KeyboardGrammarController : MonoBehaviour
             return;
         }
 
-        // ---------- Iterations (clamp to 3 minimum) ----------
+        //Iterations control
         if (CurrentGrammar != null)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -59,7 +59,7 @@ public class KeyboardGrammarController : MonoBehaviour
             }
         }
 
-        // ---------- R: Toggle random / fixed seed ----------
+        //Random seed control
         if (CurrentGrammar != null && Input.GetKeyDown(KeyCode.R))
         {
             if (CurrentGrammar.randomSeed == -1)
@@ -74,7 +74,7 @@ public class KeyboardGrammarController : MonoBehaviour
             }
         }
 
-        // ---------- Left/Right: Change seed, allow going to -1 ----------
+        //Left/Right: Change seed, allow going to -1
         if (CurrentGrammar != null)
         {
             // Left arrow → decrement seed (can go down to -1)
@@ -87,7 +87,7 @@ public class KeyboardGrammarController : MonoBehaviour
                 Debug.Log($"[{CurrentGrammar.name}] Seed changed: {CurrentGrammar.randomSeed}");
             }
 
-            // Right arrow → increment seed (can't increase random mode)
+            // Right arrow : increment seed (can't increase random mode)
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 if (CurrentGrammar.randomSeed < 0)
@@ -104,7 +104,7 @@ public class KeyboardGrammarController : MonoBehaviour
             }
         }
 
-        // ---------- SPACE = regenerate ----------
+        // Space: Regenerate
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Regenerate();

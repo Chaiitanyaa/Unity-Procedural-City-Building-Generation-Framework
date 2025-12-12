@@ -11,10 +11,9 @@ using UnityEngine;
 /// </summary>
 public class LSystemRoadCityGenerator : MonoBehaviour
 {
-    // ----------------------------
-    // L-System Configuration
-    // ----------------------------
+    
 
+    //Lsystem Grammar Configuration
     [Header("L-System Road Grammar")]
     [Tooltip("Starting string for the road L-system.")]
     public string axiom = "F";
@@ -36,10 +35,7 @@ public class LSystemRoadCityGenerator : MonoBehaviour
     [Range(1, 4)]
     public int maxNeighboursForBuilding = 2;
 
-    // ----------------------------
     // Grid / Turtle Configuration
-    // ----------------------------
-
     [Header("Grid Settings")]
     [Tooltip("World-space size of one grid cell (both X and Z).")]
     public float cellSize = 4f;
@@ -53,10 +49,7 @@ public class LSystemRoadCityGenerator : MonoBehaviour
     [Tooltip("Initial facing direction for the turtle.")]
     public Dir initialDirection = Dir.Up;
 
-    // ----------------------------
     // Road & Building Prefabs
-    // ----------------------------
-
     [Header("Prefabs")]
 
     [Tooltip("Road segment prefab; a simple quad/cube is fine.")]
@@ -83,17 +76,13 @@ public class LSystemRoadCityGenerator : MonoBehaviour
     [Tooltip("How many grid cells each 'F' should advance the turtle.")]
     public int forwardStepCells = 3;
 
-    // ----------------------------
     // Internal State
-    // ----------------------------
-
     private HashSet<Vector2Int> roadCells = new HashSet<Vector2Int>();
     private List<GameObject> spawnedRoads = new List<GameObject>();
     private List<GameObject> spawnedBuildings = new List<GameObject>();
 
-    // ----------------------------
+
     // Public Entry Points
-    // ----------------------------
 
     /// <summary>
     /// Generates a new road layout and spawns buildings.
@@ -145,10 +134,7 @@ public class LSystemRoadCityGenerator : MonoBehaviour
         roadCells.Clear();
     }
 
-    // ----------------------------
     // L-System Expansion
-    // ----------------------------
-
     private string ExpandLSystem()
     {
         string current = axiom;
@@ -177,10 +163,7 @@ public class LSystemRoadCityGenerator : MonoBehaviour
         return current;
     }
 
-    // ----------------------------
     // Turtle Interpretation
-    // ----------------------------
-
     private void BuildRoadCellsFromSentence(string sentence)
     {
         roadCells.Clear();
@@ -268,10 +251,7 @@ public class LSystemRoadCityGenerator : MonoBehaviour
         return (Dir)(((int)dir + 3) % 4); // +3 mod 4 is -1
     }
 
-    // ----------------------------
     // Instantiation: Roads
-    // ----------------------------
-
     private void InstantiateRoads()
     {
         foreach (var cell in roadCells)
@@ -290,10 +270,7 @@ public class LSystemRoadCityGenerator : MonoBehaviour
         }
     }
 
-    // ----------------------------
     // Instantiation: Buildings
-    // ----------------------------
-
     private void InstantiateBuildingsAlongRoads()
     {
         if (buildingGeneratorPrefab == null)
@@ -378,29 +355,25 @@ public class LSystemRoadCityGenerator : MonoBehaviour
         }
     }
 
-
-    // ----------------------------
     // Utility
-    // ----------------------------
-
     private void DestroyImmediateOrRuntime(GameObject go)
     {
         if (go == null) return;
 
-#if UNITY_EDITOR
-        if (!Application.isPlaying)
-            Object.DestroyImmediate(go);
-        else
+    #if UNITY_EDITOR
+            if (!Application.isPlaying)
+                Object.DestroyImmediate(go);
+            else
+                Object.Destroy(go);
+    #else
             Object.Destroy(go);
-#else
-        Object.Destroy(go);
-#endif
-    }
+    #endif
+        }
 
-    private void OnDrawGizmosSelected()
-    {
-        // Just draw the start position as a small cube.
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(startPosition, Vector3.one);
+        private void OnDrawGizmosSelected()
+        {
+            // Just draw the start position as a small cube.
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawCube(startPosition, Vector3.one);
+        }
     }
-}

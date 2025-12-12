@@ -58,7 +58,6 @@ public class ProceduralBuildingGenerator : MonoBehaviour
             return;
         }
 
-        // Clear previous children (simple version, improve with pooling later)
         //for (int i = transform.childCount - 1; i >= 0; i--)
         //{
         //    DestroyImmediate(transform.GetChild(i).gameObject);

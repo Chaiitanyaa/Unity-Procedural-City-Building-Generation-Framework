@@ -21,7 +21,7 @@ public class SimpleWalkCamera : MonoBehaviour
 
     void Update()
     {
-        // --- Movement ---
+        //Movement Controls
 
         float speed = moveSpeed;
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
@@ -48,8 +48,7 @@ public class SimpleWalkCamera : MonoBehaviour
 
         transform.position += transform.TransformDirection(localMove) * speed * Time.deltaTime;
 
-        // --- Rotation ---
-
+        // Look Controls
         float yawInput = 0f;
         if (Input.GetKey(KeyCode.RightArrow)) yawInput += 1f;
         if (Input.GetKey(KeyCode.LeftArrow))  yawInput -= 1f;
