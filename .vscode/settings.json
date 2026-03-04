@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "CSC486A_Project.sln"
+    "dotnet.defaultSolution": "Unity-Procedural-City-Building-Generation-Framework.sln"
 }
